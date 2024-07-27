@@ -1,0 +1,5 @@
+.env
+.envrc
+env
+build
+*.egg-info
