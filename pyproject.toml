@@ -3,4 +3,5 @@ name = "solana_utils"
 version = "0.1.0"
 dependencies = [
     "solana",
+    "construct",
 ]
