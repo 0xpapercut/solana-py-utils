@@ -6,7 +6,7 @@ from solders.instruction import CompiledInstruction
 from solders.pubkey import Pubkey
 
 from .transaction import (
-    get_transaction,
+    get_message,
     get_meta,
     get_account_keys,
 )
@@ -22,12 +22,11 @@ class StructuredInstruction:
 
     @classmethod
     def _build_dangling_instruction(cls, instruction: CompiledInstruction, account_keys: list[Pubkey]) -> 'StructuredInstruction':
-        instruction_json = json.loads(instruction.to_json())
         return cls(
-            program_id=account_keys[instruction_json['programIdIndex']],
-            accounts=[account_keys[index] for index in instruction_json['accounts']],
-            data=instruction_json['data'],
-            stack_height=instruction_json['stackHeight'] or 1,
+            program_id=account_keys[instruction.program_id_index],
+            accounts=[account_keys[index] for index in instruction.accounts],
+            data=instruction.data,
+            stack_height=json.loads(instruction.to_json()).get('stackHeight') or 1,
             parent_instruction=None,
             inner_instructions=[]
         )
@@ -109,8 +108,8 @@ def flattened_compiled_instructions(confirmed_transaction: EncodedConfirmedTrans
 
     return flattened
 
-def get_main_instructions(confirmed_transaction: EncodedConfirmedTransactionWithStatusMeta) -> list[CompiledInstruction]:
-    return get_transaction(confirmed_transaction).message.instructions
+def get_main_instructions(transaction) -> list[CompiledInstruction]:
+    return get_message(transaction).instructions
 
-def get_inner_instructions(confirmed_transaction: EncodedConfirmedTransactionWithStatusMeta):
-    return get_meta(confirmed_transaction).inner_instructions
+def get_inner_instructions(transaction):
+    return get_meta(transaction).inner_instructions
