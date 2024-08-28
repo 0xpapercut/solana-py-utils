@@ -20,3 +20,7 @@ def get_account_keys(transaction):
 
 def get_signature(transaction):
     return get_encoded_transaction_with_status_meta(transaction).transaction.signatures[0]
+
+def get_signers(transaction):
+    num_required_signatures = get_message(transaction).header.num_required_signatures
+    return get_account_keys(transaction)[:num_required_signatures]
