@@ -116,6 +116,9 @@ class StructuredInstructions:
 
         return flattened_instructions
 
+    def __getitem__(self, index):
+        return self.instructions[index]
+
 def flattened_compiled_instructions(transaction: EncodedConfirmedTransactionWithStatusMeta) -> list[CompiledInstruction]:
     flattened = []
 
