@@ -24,14 +24,14 @@ def client() -> Client:
 @pytest.fixture(scope="module")
 def sample_raydium_swap_confirmed_transaction(client: Client) -> EncodedConfirmedTransactionWithStatusMeta:
     signature = Signature.from_string('2JvxmigRaVSszUdVhXBNhkLQh1sxDQeB7MKLKNsk1tShdMEPLTqEkr3dshAz5zrSopRrPZsbhkwtnqJT7dHnpgBY')
-    return client.get_transaction(signature, max_supported_transaction_version=0).value
+    return client.get_transaction(signature, max_supported_transaction_version=0, encoding="base58").value
 
 def test_flattened_instructions(sample_raydium_swap_confirmed_transaction):
     flattened = flattened_compiled_instructions(sample_raydium_swap_confirmed_transaction)
     assert(len(flattened) == 13)
 
 def test_structured_instructions(sample_raydium_swap_confirmed_transaction):
-    structured = StructuredInstructions.build(sample_raydium_swap_confirmed_transaction)
+    structured = StructuredInstructions.build(sample_raydium_swap_confirmed_transaction, data_encoding="base58")
     assert(len(structured.instructions) == 5)
     flattened = structured.flattened()
     assert(len(flattened) == 13)
