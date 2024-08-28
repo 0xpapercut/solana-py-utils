@@ -14,7 +14,7 @@ InitializeAccountInstruction = Struct()
 InitializeAccount2Instruction = Struct("owner" / Pubkey)
 InitializeAccount3Instruction = Struct("owner" / Pubkey)
 
-class SplTokenDiscriminant(IntEnum):
+class SplTokenInstructionDiscriminant(IntEnum):
     TRANSFER = 3
     TRANSFER_CHECKED = 12
     INITIALIZE_ACCOUNT = 1
@@ -24,10 +24,10 @@ class SplTokenDiscriminant(IntEnum):
 SplTokenInstruction = Struct(
     "discriminant" / Int8ul,
     "instruction" / Switch(lambda ctx: ctx.discriminant, {
-        SplTokenDiscriminant.INITIALIZE_ACCOUNT: InitializeAccountInstruction,
-        SplTokenDiscriminant.INITIALIZE_ACCOUNT2: InitializeAccount2Instruction,
-        SplTokenDiscriminant.INITIALIZE_ACCOUNT3: InitializeAccount3Instruction,
-        SplTokenDiscriminant.TRANSFER: TransferInstruction,
-        SplTokenDiscriminant.TRANSFER_CHECKED: TransferCheckedInstruction,
+        SplTokenInstructionDiscriminant.INITIALIZE_ACCOUNT: InitializeAccountInstruction,
+        SplTokenInstructionDiscriminant.INITIALIZE_ACCOUNT2: InitializeAccount2Instruction,
+        SplTokenInstructionDiscriminant.INITIALIZE_ACCOUNT3: InitializeAccount3Instruction,
+        SplTokenInstructionDiscriminant.TRANSFER: TransferInstruction,
+        SplTokenInstructionDiscriminant.TRANSFER_CHECKED: TransferCheckedInstruction,
     })
 )

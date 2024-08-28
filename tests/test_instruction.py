@@ -1,5 +1,6 @@
 import os
 import pytest
+import base58
 from pprint import pprint
 
 from solana_utils.instruction import (
@@ -30,8 +31,22 @@ def test_flattened_instructions(sample_raydium_swap_confirmed_transaction):
     assert(len(flattened) == 13)
 
 def test_structured_instructions(sample_raydium_swap_confirmed_transaction):
-    # structured = StructuredInstruction.build_structured_instructions(sample_raydium_swap_confirmed_transaction)
     structured = StructuredInstructions.build(sample_raydium_swap_confirmed_transaction)
     assert(len(structured.instructions) == 5)
     flattened = structured.flattened()
     assert(len(flattened) == 13)
+
+    from spl.token._layouts import (
+        InstructionType as SplTokenInstructionType,
+        INSTRUCTIONS_LAYOUT as SplTokenInstruction,
+    )
+
+    close_account_instruction = structured.instructions[4]
+    decoded_data = SplTokenInstruction.parse(close_account_instruction.data)
+    assert decoded_data.instruction_type == SplTokenInstructionType.CLOSE_ACCOUNT
+
+    from solana_utils.program.spl_token.instruction import SplTokenInstructionDiscriminant, SplTokenInstruction
+
+    transfer_instruction = structured.instructions[3].inner_instructions[0].inner_instructions[0]
+    decoded_data = SplTokenInstruction.parse(transfer_instruction.data)
+    assert decoded_data.discriminant in (SplTokenInstructionDiscriminant.TRANSFER, SplTokenInstructionDiscriminant.TRANSFER_CHECKED)

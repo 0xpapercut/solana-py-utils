@@ -10,7 +10,7 @@ from solders.pubkey import Pubkey
 from .transaction import get_message, get_meta, get_account_keys
 from .token import TokenAccount
 from .program.spl_token.constants import TOKEN_PROGRAM_ID
-from .program.spl_token.instruction import SplTokenInstruction, SplTokenDiscriminant
+from .program.spl_token.instruction import SplTokenInstruction, SplTokenInstructionDiscriminant
 
 @dataclass
 class InstructionContext:
@@ -31,12 +31,12 @@ class InstructionContext:
         if instruction.program_id == TOKEN_PROGRAM_ID:
             decoded = SplTokenInstruction.parse(instruction.data)
             match decoded.discriminant:
-                case SplTokenDiscriminant.INITIALIZE_ACCOUNT:
+                case SplTokenInstructionDiscriminant.INITIALIZE_ACCOUNT:
                     address = instruction.accounts[0]
                     mint = instruction.accounts[1]
                     owner = instruction.accounts[2]
                     self.token_accounts[address] = TokenAccount(mint=mint, address=address, owner=owner)
-                case (SplTokenDiscriminant.INITIALIZE_ACCOUNT2 | SplTokenDiscriminant.INITIALIZE_ACCOUNT3):
+                case (SplTokenInstructionDiscriminant.INITIALIZE_ACCOUNT2 | SplTokenInstructionDiscriminant.INITIALIZE_ACCOUNT3):
                     address = instruction.accounts[0]
                     mint = instruction.accounts[1]
                     owner = decoded.instruction.owner
