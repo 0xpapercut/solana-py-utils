@@ -2,6 +2,7 @@ import json
 import base64
 import base58
 from dataclasses import dataclass
+from typing import Literal
 
 from solders.transaction_status import EncodedConfirmedTransactionWithStatusMeta
 from solders.instruction import CompiledInstruction
@@ -11,6 +12,8 @@ from .transaction import get_message, get_meta, get_account_keys
 from .token import TokenAccount
 from .program.spl_token.constants import TOKEN_PROGRAM_ID
 from .program.spl_token.instruction import SplTokenInstruction, SplTokenInstructionDiscriminant
+
+DataEncodingLiteral = Literal['base58', 'base64', 'bytes']
 
 @dataclass
 class InstructionContext:
@@ -53,9 +56,11 @@ class StructuredInstruction:
     context: InstructionContext
 
     @classmethod
-    def _build_dangling_instruction(cls, instruction: CompiledInstruction, account_keys: list[Pubkey], context: InstructionContext, data_encoding: str = "base58") -> 'StructuredInstruction':
+    def _build_dangling_instruction(cls, instruction: CompiledInstruction, account_keys: list[Pubkey], context: InstructionContext, data_encoding: DataEncodingLiteral = None) -> 'StructuredInstruction':
         data = instruction.data
-        if data_encoding == "base58":
+        if isinstance(data, bytes):
+            pass
+        elif data_encoding == "base58":
             data = base58.b58decode(data)
         elif data_encoding == "base64":
             data = base64.b64decode(data)
@@ -74,10 +79,10 @@ class StructuredInstructions:
     instructions: list['StructuredInstruction']
 
     @classmethod
-    def build(cls, transaction: EncodedConfirmedTransactionWithStatusMeta):
+    def build(cls, transaction: EncodedConfirmedTransactionWithStatusMeta, data_encoding: DataEncodingLiteral = None):
         account_keys = get_account_keys(transaction)
         context = InstructionContext.partial_build(transaction)
-        flattened_instructions = [StructuredInstruction._build_dangling_instruction(instruction, account_keys, context) for instruction in flattened_compiled_instructions(transaction)]
+        flattened_instructions = [StructuredInstruction._build_dangling_instruction(instruction, account_keys, context, data_encoding) for instruction in flattened_compiled_instructions(transaction)]
 
         structured_instructions: list[StructuredInstruction] = []
         instruction_stack: list[StructuredInstruction] = []
