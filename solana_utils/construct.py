@@ -47,3 +47,12 @@ Option = lambda struct: ExprAdapter(
 )
 
 Vec = lambda struct: PrefixedArray(Int32ul, struct)
+
+def get_field_offset(struct: Struct, field: str):
+    offset = 0
+    for subcon in struct.subcons:
+        if subcon.name == field:
+            return offset
+        else:
+            offset += subcon.sizeof()
+    raise ValueError(f"'{struct.name}' has no field '{field}'")
