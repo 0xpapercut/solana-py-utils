@@ -20,7 +20,7 @@ class InstructionContext:
     token_accounts: dict[Pubkey, TokenAccount]
 
     @classmethod
-    def partial_build(cls, transaction: EncodedConfirmedTransactionWithStatusMeta):
+    def _partial_build(cls, transaction: EncodedConfirmedTransactionWithStatusMeta):
         meta = get_meta(transaction)
         account_keys = get_account_keys(transaction)
         token_accounts: dict[Pubkey, TokenAccount] = {}
@@ -81,7 +81,7 @@ class StructuredInstructions:
     @classmethod
     def build(cls, transaction: EncodedConfirmedTransactionWithStatusMeta, data_encoding: DataEncodingLiteral = None):
         account_keys = get_account_keys(transaction)
-        context = InstructionContext.partial_build(transaction)
+        context = InstructionContext._partial_build(transaction)
         flattened_instructions = [StructuredInstruction._build_dangling_instruction(instruction, account_keys, context, data_encoding) for instruction in flattened_compiled_instructions(transaction)]
 
         structured_instructions: list[StructuredInstruction] = []
