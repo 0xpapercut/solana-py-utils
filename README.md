@@ -1,2 +1,2 @@
 # solana-py-utils
-Solana Python SDK Utilities.
+Solana Python Utilities.
