@@ -1,9 +1,9 @@
-__all__ = ['Pubkey', 'String', 'Option', 'Vec', 'StringWithLength']
+__all__ = ['Pubkey', 'String', 'Option', 'Vec', 'StringWithLength', 'PaddedVecWithLength', 'PaddedOption']
 
 from construct import (
     Struct, ExprAdapter, PrefixedArray, GreedyBytes,
     Prefixed, Array, Byte, Bytes,
-    Int32ul, Int8ul,
+    Int32ul, Int8ul, Padded,
     If, this,
 )
 from solders.pubkey import Pubkey as SoldersPubkey
@@ -35,7 +35,11 @@ Option = lambda struct: ExprAdapter(
     decoder=lambda obj, ctx: obj['value'] if obj['is_some'] == 1 else None,
 )
 
+PaddedOption = lambda struct: Padded(Int8ul.sizeof() + struct.sizeof(), Option(struct))
+
 Vec = lambda struct: PrefixedArray(Int32ul, struct)
+
+PaddedVecWithLength = lambda struct, length: Padded(Int32ul.sizeof() + struct.sizeof() * length, Vec(struct))
 
 def get_field_offset(struct: Struct, field: str):
     offset = 0
