@@ -21,14 +21,16 @@ from solders.transaction_status import EncodedConfirmedTransactionWithStatusMeta
 
 from solana.rpc.api import Client
 
-@pytest.fixture(scope="module")
-def client() -> Client:
-    return Client(os.environ['SOLANA_HTTP'])
+from .conftest import client
+# @pytest.fixture(scope="session")
+# def client() -> Client:
+#     return Client(os.environ['SOLANA_HTTP'])
 
-@pytest.fixture(scope="module")
-def sample_raydium_swap_confirmed_transaction(client: Client) -> EncodedConfirmedTransactionWithStatusMeta:
-    signature = Signature.from_string('2JvxmigRaVSszUdVhXBNhkLQh1sxDQeB7MKLKNsk1tShdMEPLTqEkr3dshAz5zrSopRrPZsbhkwtnqJT7dHnpgBY')
-    return client.get_transaction(signature, max_supported_transaction_version=0).value
+from .conftest import sample_raydium_swap_confirmed_transaction
+# @pytest.fixture(scope="module")
+# def sample_raydium_swap_confirmed_transaction(client: Client) -> EncodedConfirmedTransactionWithStatusMeta:
+#     signature = Signature.from_string('2JvxmigRaVSszUdVhXBNhkLQh1sxDQeB7MKLKNsk1tShdMEPLTqEkr3dshAz5zrSopRrPZsbhkwtnqJT7dHnpgBY')
+#     return client.get_transaction(signature, max_supported_transaction_version=0).value
 
 def test_transaction_signers(sample_raydium_swap_confirmed_transaction):
     transaction = get_encoded_transaction_with_status_meta(sample_raydium_swap_confirmed_transaction)

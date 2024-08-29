@@ -23,23 +23,27 @@ from solders.transaction_status import EncodedConfirmedTransactionWithStatusMeta
 
 from solana.rpc.api import Client
 
-@pytest.fixture(scope="module")
-def client() -> Client:
-    return Client(os.environ['SOLANA_HTTP'])
+from solana_utils.program.mpl_token_metadata.utils import find_metadata_account
+
+# @pytest.fixture(scope="module")
+# def client() -> Client:
+#     return Client(os.environ['SOLANA_HTTP'])
 
 @pytest.fixture
 def sample_datav2_bytes():
     return bytes([10, 0, 0, 0, 84, 101, 115, 116, 32, 65, 115, 115, 101, 116, 3, 0, 0, 0, 84, 83, 84, 30, 0, 0, 0, 104, 116, 116, 112, 115, 58, 47, 47, 101, 120, 97, 109, 112, 108, 101, 46, 99, 111, 109, 47, 97, 115, 115, 101, 116, 46, 106, 115, 111, 110, 244, 1, 0, 0, 0])
 
-@pytest.fixture(scope="module")
-def sample_create_metadata_accountv3_transaction(client):
-    signature = Signature.from_string('iytVJZqdAzmn6AsuX8crZSs2pojoqXiVYbtevtqtdMCVCHjBmNTPtjbuhFRXFAzKVmm2n5zrgf8rFSsFvanu5jf')
-    return client.get_transaction(signature, max_supported_transaction_version=0, encoding='base58').value
+from .conftest import sample_create_metadata_accountv3_transaction
+# @pytest.fixture(scope="module")
+# def sample_create_metadata_accountv3_transaction(client):
+#     signature = Signature.from_string('iytVJZqdAzmn6AsuX8crZSs2pojoqXiVYbtevtqtdMCVCHjBmNTPtjbuhFRXFAzKVmm2n5zrgf8rFSsFvanu5jf')
+#     return client.get_transaction(signature, max_supported_transaction_version=0, encoding='base58').value
 
-@pytest.fixture
-def sample_metadata_account(client):
-    address = Pubkey.from_string('FXEpSY3ygURNNK5MxRDcEMRygzdjGZDfE48FUm6SpoZa')
-    return client.get_account_info(address, encoding='base64')
+from .conftest import sample_metadata_account
+# @pytest.fixture
+# def sample_metadata_account(client):
+#     address = Pubkey.from_string('FXEpSY3ygURNNK5MxRDcEMRygzdjGZDfE48FUm6SpoZa')
+#     return client.get_account_info(address, encoding='base64')
 
 def test_datav2_decode(sample_datav2_bytes):
     data = DataV2.parse(sample_datav2_bytes)
@@ -55,8 +59,13 @@ def test_create_metadata_accountv3_instruction(sample_create_metadata_accountv3_
     # print(sample_create_metadata_accountv3_instruction.data
 
 def test_metadata_account_decode(sample_metadata_account):
-    # data = sample_metadata_account.value.data
-    # print(sample_metadata_account)
-    # print(data)
-    # print(Metadata.parse(data).data.name)
+    data = sample_metadata_account.data
+    print([x for x in data])
+    print(sample_metadata_account)
+    print(Metadata.parse(data).data.name)
     pass
+
+def test_find_metadata_address():
+    mint = Pubkey.from_string('4ytpZgVoNB66bFs6NRCUaAVsLdtYk2fHq4U92Jnjpump')
+    metadata = find_metadata_account(mint)
+    print(find_metadata_account(mint))

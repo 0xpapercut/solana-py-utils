@@ -17,16 +17,18 @@ from solders.transaction_status import EncodedConfirmedTransactionWithStatusMeta
 
 from solana.rpc.api import Client
 
-@pytest.fixture(scope="module")
-def client() -> Client:
-    return Client(os.environ['SOLANA_HTTP'])
+# @pytest.fixture(scope="module")
+# def client() -> Client:
+#     return Client(os.environ['SOLANA_HTTP'])
 
-@pytest.fixture(scope="module")
-def sample_raydium_swap_confirmed_transaction(client: Client) -> EncodedConfirmedTransactionWithStatusMeta:
-    signature = Signature.from_string('2JvxmigRaVSszUdVhXBNhkLQh1sxDQeB7MKLKNsk1tShdMEPLTqEkr3dshAz5zrSopRrPZsbhkwtnqJT7dHnpgBY')
-    return client.get_transaction(signature, max_supported_transaction_version=0, encoding="base58").value
+from .conftest import sample_raydium_swap_confirmed_transaction
+# @pytest.fixture(scope="module")
+# def sample_raydium_swap_confirmed_transaction(client: Client) -> EncodedConfirmedTransactionWithStatusMeta:
+#     signature = Signature.from_string('2JvxmigRaVSszUdVhXBNhkLQh1sxDQeB7MKLKNsk1tShdMEPLTqEkr3dshAz5zrSopRrPZsbhkwtnqJT7dHnpgBY')
+#     return client.get_transaction(signature, max_supported_transaction_version=0, encoding="base58").value
 
 def test_flattened_instructions(sample_raydium_swap_confirmed_transaction):
+    print(type(sample_raydium_swap_confirmed_transaction))
     flattened = flattened_compiled_instructions(sample_raydium_swap_confirmed_transaction)
     assert(len(flattened) == 13)
 
