@@ -14,7 +14,8 @@ from construct import (
     If,
     this,
     PrefixedArray,
-    Enum
+    Enum,
+    Padded
 )
 from ...construct import *
 
@@ -35,6 +36,14 @@ Uses = Struct(
     "total" / Int64ul,
 )
 
+Data = Struct(
+    "name" / StringWithLength(32),
+    "symbol" / StringWithLength(10),
+    "uri" / StringWithLength(200),
+    "seller_fee_basis_points" / Int16ul,
+    "creators" / PaddedOption(PaddedVecWithLength(Creator, 5)),
+)
+
 DataV2 = Struct(
     "name" / String,
     "symbol" / String,
@@ -43,14 +52,6 @@ DataV2 = Struct(
     "creators" / Option(Vec(Creator)),
     "collection" / Option(Collection),
     "uses" / Option(Uses),
-)
-
-Data = Struct(
-    "name" / String,
-    "symbol" / String,
-    "uri" / String,
-    "seller_fee_basis_points" / Int16ul,
-    "creators" / Option(Vec(Creator)),
 )
 
 Key = Enum(
@@ -82,20 +83,20 @@ TokenStandard = Enum(
     PROGRAMMABLE_NON_FUNGIBLE_EDITION=5,
 )
 
-CollectionDetails = Struct(
+CollectionDetails = Padded(Int64ul.sizeof(), Struct(
     "type" / Int8ul,
     "data" / Switch(lambda ctx: ctx.type, {
         0: Struct("size" / Int64ul),
         1: Struct("padding" / Int64ul),
     })
-)
+))
 
-ProgrammableConfig = Struct(
+ProgrammableConfig = Padded(Int8ul.sizeof() + PaddedOption(Pubkey).sizeof(), Struct(
     "type" / Int8ul,
     "data" / Switch(lambda ctx: ctx.type, {
         0: Struct("rule_set" / Option(Pubkey)),
     })
-)
+))
 
 Metadata = Struct(
     "key" / Key,
@@ -104,10 +105,10 @@ Metadata = Struct(
     "data" / Data,
     "primary_sale_happend" / Int8ul,
     "is_mutable" / Int8ul,
-    "edition_nonce" / Option(Int8ul),
-    "token_standard" / Option(TokenStandard),
-    "collection" / Option(Collection),
-    "uses" / Option(Uses),
-    "collection_details" / Option(CollectionDetails),
-    "programmable_config" / Option(ProgrammableConfig),
+    "edition_nonce" / PaddedOption(Int8ul),
+    "token_standard" / PaddedOption(TokenStandard),
+    "collection" / PaddedOption(Collection),
+    "uses" / PaddedOption(Uses),
+    "collection_details" / PaddedOption(CollectionDetails),
+    "programmable_config" / PaddedOption(ProgrammableConfig),
 )
